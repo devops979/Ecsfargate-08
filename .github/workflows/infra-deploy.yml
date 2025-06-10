@@ -73,24 +73,21 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           region: ${{ env.AWS_REGION }}
-
+          
       - name: Build and Push Images
         if: ${{ !github.event.inputs.skip_build }}
         run: |
           TAG="${{ github.event.inputs.image_tag || 'latest' }}"
           
-          # Build and push patient service if changed
-          if [ -d "app/patient-service" ] && \
-             (git diff --quiet HEAD^ HEAD -- app/patient-service/ || [ "${{ github.event.inputs.skip_build }}" = "false" ]); then
+          # Always build if directory exists and we're not skipping builds
+          if [ -d "app/patient-service" ]; then
             echo "Building patient-service..."
             docker build -t ${{ steps.terraform-output.outputs.patient_ecr_url }}:$TAG \
               -f app/patient-service/Dockerfile app/patient-service
             docker push ${{ steps.terraform-output.outputs.patient_ecr_url }}:$TAG
           fi
           
-          # Build and push appointment service if changed
-          if [ -d "app/appointment-service" ] && \
-             (git diff --quiet HEAD^ HEAD -- app/appointment-service/ || [ "${{ github.event.inputs.skip_build }}" = "false" ]); then
+          if [ -d "app/appointment-service" ]; then
             echo "Building appointment-service..."
             docker build -t ${{ steps.terraform-output.outputs.appointment_ecr_url }}:$TAG \
               -f app/appointment-service/Dockerfile app/appointment-service
