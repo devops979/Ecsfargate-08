@@ -12,7 +12,7 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 }
 
 resource "aws_ecs_task_definition" "patient_service" {
-  family                   = var.ecs_task_family
+  family                   = var.ecs_task_family_patient
   execution_role_arn       = var.ecs_execution_role_arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -46,7 +46,7 @@ resource "aws_ecs_task_definition" "patient_service" {
 }
 
 resource "aws_ecs_task_definition" "appointment_service" {
-  family                   = var.ecs_task_family
+  family                   = var.ecs_task_family_appointment
   execution_role_arn       = var.ecs_execution_role_arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
