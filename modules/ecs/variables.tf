@@ -3,7 +3,12 @@ variable "ecs_cluster_name" {
   type        = string
 }
 
-variable "ecs_task_family" {
+variable "ecs_task_family_patient" {
+  description = "ECS Task Definition Family"
+  type        = string
+}
+
+variable "ecs_task_family_appointment" {
   description = "ECS Task Definition Family"
   type        = string
 }
