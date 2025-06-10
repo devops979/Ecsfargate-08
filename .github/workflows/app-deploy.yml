@@ -53,6 +53,10 @@ jobs:
         working-directory: ./
         run: terraform init
 
+      - name: Terraform Format - Infra
+        working-directory: ./
+        run: terraform fmt -recursive
+
       - name: Terraform Validate
         working-directory: ./
         run: terraform validate
