@@ -1,31 +1,73 @@
-name: terraform Infra Destroy
-
+name: Destroy Infrastructure
+ 
 on:
   workflow_dispatch:
-
-jobs:
+    inputs:
+      environment:
+        description: 'Environment to destroy'
+        required: true
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+      confirm_destroy:
+        description: 'Type "DESTROY" to confirm'
+        required: true
+        type: string
+      destroy_ecr:
+        description: 'Also destroy ECR repository (will delete all images)'
+        required: false
+        default: false
+        type: boolean
  
-  destroy-infra:
+env:
+  AWS_REGION: ap-south-1
+ 
+permissions:
+  id-token: write
+  contents: read
+ 
+jobs:
+  destroy-infrastructure:
+    name: Destroy Infrastructure
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    if: github.event.inputs.confirm_destroy == 'DESTROY'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Configure AWS credentials for Terraform
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: actions/checkout@v4
+ 
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: GitHubActions-Destroy-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+ 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ">=1.12.0"
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Terraform Init
+      - name: Terraform Init - Infra
+        working-directory: ./
         run: terraform init
 
-      - name: Terraform Plan
-        run: terraform plan -destroy -var-file=env/dev/dev.tfvars
-
-      - name: Terraform Destroy
-        run: terraform destroy -var-file=env/dev/dev.tfvars -auto-approve
+      - name: Select or Create Terraform Workspace
+        working-directory: ./
+        run: |
+          env="${{ github.event.inputs.environment || 'prod' }}"
+          if ! terraform workspace list | grep -w "$env"; then
+            terraform workspace new "$env"
+          fi
+          terraform workspace select "$env"
+  
+ 
+      - name: Destroy Main Infrastructure
+        working-directory: ./Infra/
+        run: |
+          terraform init
+          terraform destroy -auto-approve \
+            -var="aws_region=${{ env.AWS_REGION }}"
+ 
