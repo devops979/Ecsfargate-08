@@ -61,7 +61,13 @@ variable "ecs_cluster_name" {
   default     = "demo-ecs-cluster"
 }
 
-variable "ecs_task_family" {
+variable "task_family_patient" {
+  description = "ECS Task Definition Family"
+   type        = string
+  default     = "demo-task-family"
+}
+
+variable "task_family_appointment" {
   description = "ECS Task Definition Family"
    type        = string
   default     = "demo-task-family"
