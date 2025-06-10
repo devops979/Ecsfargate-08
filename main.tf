@@ -113,7 +113,7 @@ module "alb" {
   appointment_service_ip = module.ecs.appointment_service_ip
   vpc_id                 = module.network.vpc_id
   lb_security_group      = [module.network.alb_security_group_id]
-  lb_subnets             = [module.network.public_subnet_id]
+  lb_subnets             = [module.network.public_subnets_id]
 }
 
 
