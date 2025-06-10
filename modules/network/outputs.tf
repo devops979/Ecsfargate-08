@@ -27,21 +27,34 @@ output "private_route_table_ids" {
 }
 
 output "ecs_security_group_id" {
-  description = "The ID of the Lambda security group"
+  description = "The ID of the demo security group"
   value       = aws_security_group.demo_sg.id
 }
 
 output "alb_security_group_id" {
-  description = "The ID of the Lambda security group"
+  description = "The ID of the ALB security group"
   value       = aws_security_group.alb_sg.id
 }
 
 output "security_group_arn" {
   description = "The ARN of the Lambda security group"
-  value       = aws_security_group.lambda_sg.arn
+  value       = aws_security_group.demo_sg.arn
 }
 
 output "security_group_name" {
   description = "The name of the Lambda security group"
-  value       = aws_security_group.lambda_sg.name
+  value       = aws_security_group.demo_sg.name
 }
+
+
+output "alb_security_group_arn" {
+  description = "The ARN of the Lambda security group"
+  value       = aws_security_group.alb_sg.arn
+}
+
+output "alb_security_group_name" {
+  description = "The name of the Lambda security group"
+  value       = aws_security_group.alb_sg.name
+}
+
+
