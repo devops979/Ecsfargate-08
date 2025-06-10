@@ -90,23 +90,23 @@ output "log_group_name" {
 }
 
 
-output "ecr_repository_url" {
+output "patitent_repository_url" {
   description = "URL of the ECR repository"
   value       = module.patitent.repository_url
 }
 
-output "ecr_repository_arn" {
+output "patitent_repository_arn" {
   description = "ARN of the ECR repository"
   value       = module.patitent.repository_arn
 }
 
 
-output "ecr_repository_url" {
+output "appointment_repository_url" {
   description = "URL of the ECR repository"
   value       = module.appointment.repository_url
 }
 
-output "ecr_repository_arn" {
+output "appointment_repository_arn" {
   description = "ARN of the ECR repository"
   value       = module.appointment.repository_arn
 }
