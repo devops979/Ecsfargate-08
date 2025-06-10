@@ -27,9 +27,9 @@ module "iam" {
 }
 
 
-module "ecr" {
+module "patitent" {
   source          = "./modules/ecr"
-  repository_name = "${var.service_name}-${terraform.workspace}"
+  repository_name = "${var.service_name_patitent}"
   lifecycle_policy = jsonencode({
     rules = [{
       rulePriority = 1,
@@ -44,6 +44,24 @@ module "ecr" {
   })
 }
 
+
+
+module "appointment" {
+  source          = "./modules/ecr"
+  repository_name = "${var.service_name_appointment}"
+  lifecycle_policy = jsonencode({
+    rules = [{
+      rulePriority = 1,
+      description  = "Keep last 5 images",
+      action       = { type = "expire" },
+      selection = {
+        tagStatus   = "any",
+        countType   = "imageCountMoreThan",
+        countNumber = 5
+      }
+    }]
+  })
+}
 
 module "ecs" {
   source = "./modules/ecs"
