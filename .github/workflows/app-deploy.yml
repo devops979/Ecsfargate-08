@@ -44,7 +44,7 @@ jobs:
           terraform_version: ">= 1.12.0"  # or latest stable
 
       - name: Terraform Init - Infra
-        working-directory: ./Infra
+        working-directory: ./
         run: terraform init
 
       - name: Terraform Validate
@@ -75,7 +75,7 @@ jobs:
         run: terraform apply tfplan
 
       - name: Get ECR Repository URI
-        working-directory: ./Infra
+        working-directory: ./
         id: ecr-uri
         run: |
           ECR_URL=$(terraform output -raw ecr_repository_url)
