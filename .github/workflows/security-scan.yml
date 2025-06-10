@@ -106,6 +106,7 @@ jobs:
         uses: actions/setup-node@v3.9.1
         with:
           node-version: '18'
+          
 
       - name: Install terraform-docs
         run: |
