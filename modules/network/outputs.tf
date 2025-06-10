@@ -26,9 +26,14 @@ output "private_route_table_ids" {
   value = aws_route_table.private-routing-table.*.id
 }
 
-output "security_group_id" {
+output "ecs_security_group_id" {
   description = "The ID of the Lambda security group"
-  value       = aws_security_group.lambda_sg.id
+  value       = aws_security_group.demo_sg.id
+}
+
+output "alb_security_group_id" {
+  description = "The ID of the Lambda security group"
+  value       = aws_security_group.alb_sg.id
 }
 
 output "security_group_arn" {
