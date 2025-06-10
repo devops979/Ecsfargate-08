@@ -8,6 +8,7 @@ module "network" {
   azs                = var.availability_zones
   owner              = "demo-ecs-fargate"
   name_prefix        = var.name_prefix
+  ingress_rules      = [3000,30001,22]
 }
 
 module "nat" {
@@ -53,8 +54,8 @@ module "ecs" {
   ecs_task_role_arn         = module.iam.ecs_task_role_arn
   patient_service_image     = var.patient_service_image
   appointment_service_image = var.appointment_service_image
-  subnet_id                 = module.network.private_subnet_cidrs[0]
-  security_group_id         = module.vpc.ecs_service_sg_id
+  subnet_id                 = module.network.private_subnet_cidrs
+  security_group_id         = module.network.ecs_security_group_id
   appointment_tg_arn        = module.alb.patient_tg_arn
   patient_tg_arn            = module.alb.appointment_tg_arn
   alb_arn                   = module.alb.alb_arn
@@ -66,9 +67,9 @@ module "alb" {
   alb_name               = var.alb_name
   patient_service_ip     = module.ecs.patient_service_ip
   appointment_service_ip = module.ecs.appointment_service_ip
-  vpc_id                 = module.vpc.vpc_id
-  lb_security_group      = [module.vpc.alb_sg_id]
-  lb_subnets             = [module.vpc.public_subnet_1_id, module.vpc.public_subnet_2_id]
+  vpc_id                 = module.network.vpc_id
+  lb_security_group      = [module.network.alb_security_group_id]
+  lb_subnets             = [module.network.private_subnet_ids]
 }
 
 
