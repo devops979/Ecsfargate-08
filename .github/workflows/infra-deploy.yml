@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   build_and_push:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       patient_image_uri: ${{ steps.terraform-output.outputs.patient_ecr_url }}:${{ github.event.inputs.image_tag || 'latest' }}
       appointment_image_uri: ${{ steps.terraform-output.outputs.appointment_ecr_url }}:${{ github.event.inputs.image_tag || 'latest' }}
@@ -95,7 +95,7 @@ jobs:
           fi
 
   deploy_infrastructure:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: build_and_push
     environment: ${{ github.event.inputs.environment || 'dev' }}
     
