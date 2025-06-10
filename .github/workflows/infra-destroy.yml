@@ -65,7 +65,7 @@ jobs:
   
  
       - name: Destroy Main Infrastructure
-        working-directory: ./Infra/
+        working-directory: ./
         run: |
           terraform init
           terraform destroy -auto-approve \
