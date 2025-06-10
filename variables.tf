@@ -4,35 +4,56 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "name_prefix" {
+  description = "Prefix for resource names"
+  type        = string
+}
+
 variable "vpc_cidr_block" {
   description = "The CIDR block for the VPC"
   type        = string
   default     = "10.0.0.0/16"
 }
 
-variable "subnet_cidr_block_1" {
-  description = "The CIDR block for the first subnet"
+
+variable "environment" {
+  description = "Deployment environment"
   type        = string
-  default     = "10.0.1.0/24"
+  default     = "dev"
 }
 
-variable "subnet_cidr_block_2" {
-  description = "The CIDR block for the second subnet"
+variable "service_name_patitent" {
+  description = "The Name of the Ecr Repository"
   type        = string
-  default     = "10.0.2.0/24"
+  default     = "dev/demo-ecs-patitent"
 }
 
-variable "availability_zone_1" {
-  description = "The availability zone for the first subnet"
+
+variable "service_name_appointment" {
+  description = "The Name of the Ecr Repository"
   type        = string
-  default     = "us-east-1a"
+  default     = "dev/demo-ecs-appointment"
 }
 
-variable "availability_zone_2" {
-  description = "The availability zone for the second subnet"
-  type        = string
-  default     = "us-east-1b"
+
+variable "public_subnet_cidrs" {
+  description = "List of CIDR blocks for public subnets"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
+
+variable "private_subnet_cidrs" {
+  description = "List of CIDR blocks for private subnets"
+  type        = list(string)
+  default     = ["10.0.101.0/24", "10.0.102.0/24"]
+}
+
+variable "availability_zones" {
+  description = "List of availability zones"
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b"]
+}
+
 
 variable "ecs_cluster_name" {
   description = "Name of the ECS Cluster"
