@@ -30,7 +30,7 @@ variable "appointment_service_image" {
 
 variable "subnet_id" {
   description = "Subnet ID for ECS services"
-  type        = string
+  type        = list(string)
 }
 
 variable "security_group_id" {
