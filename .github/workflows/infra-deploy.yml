@@ -131,8 +131,6 @@ jobs:
           env="${{ github.event.inputs.environment || 'dev' }}"
           terraform plan \
             -var="environment=$env" \
-            -var="patient_image_uri=${{ needs.build_and_push.outputs.patient_image_uri }}" \
-            -var="appointment_image_uri=${{ needs.build_and_push.outputs.appointment_image_uri }}" \
             -var-file="./environments/$env/$env.tfvars" \
             -out=tfplan
 
