@@ -53,7 +53,7 @@ module "ecs" {
   ecs_task_role_arn         = module.iam.ecs_task_role_arn
   patient_service_image     = var.patient_service_image
   appointment_service_image = var.appointment_service_image
-  subnet_id                 = module.vpc.public_subnet_1_id
+  subnet_id                 = module.network.private_subnet_cidrs[0]
   security_group_id         = module.vpc.ecs_service_sg_id
   appointment_tg_arn        = module.alb.patient_tg_arn
   patient_tg_arn            = module.alb.appointment_tg_arn
