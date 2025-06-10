@@ -89,3 +89,24 @@ output "log_group_name" {
   value       = module.cloudwatch.log_group_name
 }
 
+
+output "ecr_repository_url" {
+  description = "URL of the ECR repository"
+  value       = module.patitent.repository_url
+}
+
+output "ecr_repository_arn" {
+  description = "ARN of the ECR repository"
+  value       = module.patitent.repository_arn
+}
+
+
+output "ecr_repository_url" {
+  description = "URL of the ECR repository"
+  value       = module.appointment.repository_url
+}
+
+output "ecr_repository_arn" {
+  description = "ARN of the ECR repository"
+  value       = module.appointment.repository_arn
+}
