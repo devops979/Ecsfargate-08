@@ -26,22 +26,28 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      patient-service: ${{ steps.set.outputs.patient-service }}
-      appointment-service: ${{ steps.set.outputs.appointment-service }}
+      patient-service: ${{ steps.changes.outputs.patient-service }}
+      appointment-service: ${{ steps.changes.outputs.appointment-service }}
     
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        
+        with:
+          fetch-depth: 0  # 👈 fetch full commit history
+
+      - name: Fetch complete git history (for proper diff)
+        run: git fetch --prune --unshallow
+
       - name: Detect Changes
-        id: changes
         uses: dorny/paths-filter@v2
+        id: changes
         with:
           filters: |
             patient-service:
               - 'app/patient-service/**'
             appointment-service:
               - 'app/appointment-service/**'
+
 
       - name: Set Outputs
         id: set
