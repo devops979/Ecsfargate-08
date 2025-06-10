@@ -98,7 +98,7 @@ module "ecs" {
   ecs_task_role_arn         = module.iam.ecs_task_role_arn
   patient_service_image     = var.patient_service_image
   appointment_service_image = var.appointment_service_image
-  subnet_id                 = module.network.private_subnet_cidrs
+  subnet_id                 = module.network.private_subnets_id
   security_group_id         = module.network.ecs_security_group_id
   appointment_tg_arn        = module.alb.patient_tg_arn
   patient_tg_arn            = module.alb.appointment_tg_arn
@@ -113,7 +113,7 @@ module "alb" {
   appointment_service_ip = module.ecs.appointment_service_ip
   vpc_id                 = module.network.vpc_id
   lb_security_group      = [module.network.alb_security_group_id]
-  lb_subnets             = [module.network.private_subnet_ids]
+  lb_subnets             = [module.network.public_subnet_id]
 }
 
 
