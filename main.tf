@@ -8,7 +8,33 @@ module "network" {
   azs                = var.availability_zones
   owner              = "demo-ecs-fargate"
   name_prefix        = var.name_prefix
-  ingress_rules      = [3000,30001,22]
+  ingress_rules = [
+  {
+    name        = "app-port"
+    description = "Allow traffic to app port"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  },
+  {
+    name        = "custom-port"
+    description = "Allow traffic to custom port"
+    from_port   = 30001
+    to_port     = 30001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  },
+  {
+    name        = "ssh"
+    description = "Allow SSH access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+]
+
 }
 
 module "nat" {
