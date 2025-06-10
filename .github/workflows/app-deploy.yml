@@ -85,16 +85,17 @@ jobs:
         run: terraform apply tfplan
 
       - name: Get ECR Repository URI
-        working-directory: ./
         id: ecr-uri
         run: |
-          ECR_URL=$(terraform output -raw appointment_repository_url)
-          echo "ecr_url=$ECR_URL" >> $GITHUB_OUTPUT
+          ECR_URL=$(terraform output -raw appointment_repository_url | head -n 1)
+          echo "ecr_url=$ECR_URL" >> "$GITHUB_OUTPUT"
           echo "ECR Repository URI: $ECR_URL"
-          ECR_URL_patitent=$(terraform output -raw patitent_repository_url)
-          echo "ecr_url_new=$ECR_URL_patitent" >> $GITHUB_OUTPUT
+      
+          ECR_URL_patitent=$(terraform output -raw patitent_repository_url | head -n 1)
+          echo "ecr_url_new=$ECR_URL_patitent" >> "$GITHUB_OUTPUT"
           echo "ECR Repository URI: $ECR_URL_patitent"
+
 
     outputs:
       ecr_url: ${{ steps.ecr-uri.outputs.ecr_url }}
-      ecr_url_new: ${{ steps.ecr-ui.outputs.ecr_url_new }}
+      ecr_url_new: ${{ steps.ecr-uri.outputs.ecr_url_new }}
