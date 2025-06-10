@@ -1,48 +1,86 @@
-name: app-build-push
+name: ECR Repository Management
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+
+env:
+  AWS_REGION: ap-south-1
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  deploy-app:
-    runs-on: ubuntu-latest
-    
+  create-ecr-repository:
+    name: Create ECR Repository
+    runs-on: self-hosted
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main'))
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-        
-      - name: Configure AWS credentials for Docker/ECR
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-  
-      - name: Create ECR
-        run: |
-          aws ecr create-repository --repository-name patient-service
-          aws ecr create-repository --repository-name appointment-service
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
-          region: us-east-1
+          terraform_version: ">= 1.12.0"  # or latest stable
 
-      - name: Build patient-service Docker image
-        run: |
-          docker build -t 741448937052.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest -f app/patient-service/Dockerfile app/patient-service
+      - name: Terraform Init - Infra
+        working-directory: ./Infra
+        run: terraform init
 
-      - name: Build appointment-service Docker image
-        run: |
-          docker build -t 741448937052.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest -f app/appointment-service/Dockerfile app/appointment-service
+      - name: Terraform Validate
+        working-directory: ./
+        run: terraform validate
 
-      - name: Push patient-service Docker image to ECR
+      - name: Select or Create Terraform Workspace
+        working-directory: ./
         run: |
-          docker push 741448937052.dkr.ecr.us-east-1.amazonaws.com/patient-service:latest
-          
-      - name: Push appointment-service Docker image to ECR
+          env="${{ github.event.inputs.environment || 'dev' }}"
+          if ! terraform workspace list | grep -w "$env"; then
+            terraform workspace new "$env"
+          fi
+          terraform workspace select "$env"
+
+      - name: Terraform Plan
+        working-directory: ./
         run: |
-          docker push 741448937052.dkr.ecr.us-east-1.amazonaws.com/appointment-service:latest
+          env="${{ github.event.inputs.environment || 'dev' }}"
+          terraform plan \
+            -var="environment=$env" \
+            -var-file="../environments/$env/$env.tfvars" \
+            -target=module.patitent -target=module.appointment \
+            -out=tfplan
+
+      - name: Terraform Apply (ECR only)
+        working-directory: ./
+        run: terraform apply tfplan
+
+      - name: Get ECR Repository URI
+        working-directory: ./Infra
+        id: ecr-uri
+        run: |
+          ECR_URL=$(terraform output -raw ecr_repository_url)
+          echo "ecr_url=$ECR_URL" >> $GITHUB_OUTPUT
+          echo "ECR Repository URI: $ECR_URL"
+
+    outputs:
+      ecr_url: ${{ steps.ecr-uri.outputs.ecr_url }}          
