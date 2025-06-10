@@ -1,0 +1,15 @@
+aws_region                = "ap-south-1"
+vpc_cidr_block            = "192.168.0.0/16"
+environment               = "dev"
+public_subnet_cidrs       = ["192.168.1.0/24","192.168.2.0/24"]  
+private_subnet_cidrs      = ["192.168.101.0/24","192.168.102.0/24]     
+alb_name                  = "demo-apps-alb"
+ecs_cluster_name          = "demo-ecs-cluster"
+ecs_task_family           = "demo-task-family"
+patient_service_image     = "211125325699.dkr.ecr.ap-south-1.amazonaws.com/patient-service:latest"
+appointment_service_image = "211125325699.dkr.ecr.ap-south-1.amazonaws.com/appointment-service:latest"
+log_group_name            = "ecs-cluster-logs"
+service_name_patitent   = "dev/demo-ecs-patitent"
+service_name_appointment = "dev/demo-ecs-appointment"
+ecs_execution_role_name = "ecs-execution-role"
+ecs_task_role_name      = "ecs-task-role"
