@@ -9,7 +9,7 @@ resource "aws_security_group" "demo_sg" {
 }
 
 # Default outbound rule (allow all outbound traffic)
-resource "aws_security_group_rule" "lambda_egress" {
+resource "aws_security_group_rule" "ecs_egress" {
   security_group_id = aws_security_group.demo_sg.id
   type              = "egress"
   from_port         = 0
@@ -30,3 +30,37 @@ resource "aws_security_group_rule" "ecs_ingress" {
   protocol          = each.value.protocol
   cidr_blocks       = each.value.cidr_blocks
 }
+
+
+resource "aws_security_group" "alb_sg" {
+  name        = "${var.name_prefix}-sg"
+  description = "Security group for containers"
+  vpc_id      = aws_vpc.demo-vpc.id
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-containers-sg"
+  })
+}
+
+# Default outbound rule (allow all outbound traffic)
+resource "aws_security_group_rule" "ecs_egress" {
+  security_group_id = aws_security_group.alb_sg.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1" # All protocols
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+# Add custom ingress rules if needed
+resource "aws_security_group_rule" "ecs_ingress" {
+  security_group_id = aws_security_group.alb_sg.id
+  type              = "ingress"
+  description       = "Alloing load balancer port"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+
+}
+
