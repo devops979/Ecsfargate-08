@@ -1,4 +1,4 @@
-name: Validate Infrastructure
+name: Scan and Validate the Infrastructure
 
 on: 
   pull_request:
@@ -47,17 +47,30 @@ jobs:
           output_file_path: console,results.sarif
           soft_fail: true
 
-      - name: Upload SARIF file
-        if: success() || failure()
+
+      - name: Install GitHub CLI
         run: |
-          if [ -f "results.sarif" ]; then
-            echo "SARIF file found. Uploading..."
-            gh codeql upload-sarif --sarif=results.sarif
-          else
-            echo "No SARIF file found. Skipping upload."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          sudo apt update
+          sudo apt install -y gh
+
+          - name: Upload SARIF file
+          if: success() || failure()
+          run: |
+            if [ -f "results.sarif" ]; then
+              echo "Installing GitHub CLI..."
+              sudo apt update && sudo apt install -y gh
+        
+              echo "Authenticating GitHub CLI..."
+              echo "${{ secrets.GITHUBTOKEN }}" | gh auth login --with-token
+        
+              echo "SARIF file found. Uploading..."
+              gh codeql upload-sarif --sarif=results.sarif
+            else
+              echo "No SARIF file found. Skipping upload."
+            fi
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+        
 
 
       - name: Configure AWS Credentials (OIDC)
