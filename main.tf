@@ -55,7 +55,7 @@ module "iam" {
 
 module "patitent" {
   source          = "./modules/ecr"
-  repository_name = "${var.service_name_patitent}"
+  repository_name = var.service_name_patitent
   lifecycle_policy = jsonencode({
     rules = [{
       rulePriority = 1,
@@ -74,7 +74,7 @@ module "patitent" {
 
 module "appointment" {
   source          = "./modules/ecr"
-  repository_name = "${var.service_name_appointment}"
+  repository_name = var.service_name_appointment
   lifecycle_policy = jsonencode({
     rules = [{
       rulePriority = 1,
