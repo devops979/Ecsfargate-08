@@ -1,6 +1,6 @@
-variable "public_subnet_ids" {
+variable "public_subnet_id" {
   description = "The public subnet ID for the NAT Gateway"
-  type        = list(string)
+  type        = string
 }
 
 variable "private_rt_ids" {
