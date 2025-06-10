@@ -1,3 +1,14 @@
+resource "aws_security_group" "demo_sg" {
+  name        = "${var.name_prefix}-${terraform.workspace}-sg"
+  description = "Security group for Task definition"
+  vpc_id      = aws_vpc.demo-vpc.id
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-ecs_fargate-sg"
+  })
+}
+
+
 # For demo_sg
 resource "aws_security_group_rule" "ecs_egress_demo" {
   security_group_id = aws_security_group.demo_sg.id
@@ -19,6 +30,18 @@ resource "aws_security_group_rule" "ecs_ingress_demo" {
   protocol          = each.value.protocol
   cidr_blocks       = each.value.cidr_blocks
 }
+
+resource "aws_security_group" "alb_sg" {
+  name        = "${var.name_prefix}-${terraform.workspace}-sg"
+  description = "Security group for LoadBalancer"
+  vpc_id      = aws_vpc.demo-vpc.id
+
+  tags = merge(var.tags, {
+    Name = "${var.name_prefix}-alb-sg"
+  })
+}
+
+
 
 # For alb_sg
 resource "aws_security_group_rule" "ecs_egress_alb" {
