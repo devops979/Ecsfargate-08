@@ -76,7 +76,7 @@ jobs:
           env="${{ github.event.inputs.environment || 'dev' }}"
           terraform plan \
             -var="environment=$env" \
-            -var-file="../environments/$env/$env.tfvars" \
+            -var-file="./environments/$env/$env.tfvars" \
             -target=module.patitent -target=module.appointment \
             -out=tfplan
 
