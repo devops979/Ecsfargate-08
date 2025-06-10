@@ -28,12 +28,12 @@ output "route_table_id" {
 
 output "ecs_service_sg_id" {
   description = "The ID of the ECS Service Security Group"
-  value       = module.vpc.ecs_service_sg_id
+  value       = module.network.ecs_service_sg_id
 }
 
 output "alb_sg_id" {
   description = "The ID of the Application Load Balancer Security Group"
-  value       = module.vpc.alb_sg_id
+  value       = module.network.alb_sg_id
 }
 
 output "ecs_execution_role_arn" {
