@@ -11,11 +11,12 @@ module "network" {
 }
 
 module "nat" {
-  source            = "./modules/nat"
-  public_subnet_ids = module.network.public_subnets_id
-  private_rt_ids    = module.network.private_route_table_ids
-  vpc_name          = module.network.vpc_name
+  source           = "./modules/nat"
+  public_subnet_id = module.network.public_subnets_id[0]
+  private_rt_ids   = module.network.private_route_table_ids
+  vpc_name         = module.network.vpc_name
 }
+
 
 module "iam" {
   source = "./modules/iam" 
