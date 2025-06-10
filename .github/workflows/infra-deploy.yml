@@ -1,17 +1,21 @@
-name: Build and Deploy app
+name: Build and Deploy App
 
 on:
   push:
     branches: [main]
-    paths: ['app/**']
+    paths:
+      - 'app/patient-service/**'
+      - 'app/appointment-service/**'
   pull_request:
     branches: [main]
-    paths: ['app/**']
+    paths:
+      - 'app/patient-service/**'
+      - 'app/appointment-service/**'
   workflow_dispatch:
 
 permissions:
-  id-token:   write
-  contents:   write     
+  id-token: write
+  contents: write     
   pull-requests: write
 
 env:
@@ -22,16 +26,16 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      patient-service: ${{ steps.changes.outputs.patient-service }}
-      appointment-service: ${{ steps.changes.outputs.appointment-service }}
+      patient-service: ${{ steps.set.outputs.patient-service }}
+      appointment-service: ${{ steps.set.outputs.appointment-service }}
     
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         
       - name: Detect Changes
-        uses: dorny/paths-filter@v2
         id: changes
+        uses: dorny/paths-filter@v2
         with:
           filters: |
             patient-service:
@@ -39,12 +43,18 @@ jobs:
             appointment-service:
               - 'app/appointment-service/**'
 
+      - name: Set Outputs
+        id: set
+        run: |
+          echo "patient-service=${{ steps.changes.outputs.patient-service }}" >> "$GITHUB_OUTPUT"
+          echo "appointment-service=${{ steps.changes.outputs.appointment-service }}" >> "$GITHUB_OUTPUT"
+
   build-patient-service:
     name: Build Patient Service
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.patient-service == 'true'
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -63,7 +73,7 @@ jobs:
         working-directory: app/patient-service
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: dev/demo-ecs-patitent
+          ECR_REPOSITORY: dev/demo-ecs-patient
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -76,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.appointment-service == 'true'
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -102,6 +112,7 @@ jobs:
           docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
 
   deploy_infrastructure:
     runs-on: ubuntu-latest
