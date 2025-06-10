@@ -1,26 +1,29 @@
 output "vpc_id" {
-  description = "The ID of the VPC"
-  value       = module.vpc.vpc_id
+  description = "ID of the VPC"
+  value       = module.network.vpc_id
 }
 
-output "public_subnet_1_id" {
-  description = "The ID of the first public subnet"
-  value       = module.vpc.public_subnet_1_id
+output "public_subnet_ids" {
+  description = "IDs of the public subnets"
+  value       = module.network.public_subnets_id
 }
 
-output "public_subnet_2_id" {
-  description = "The ID of the second public subnet"
-  value       = module.vpc.public_subnet_2_id
+output "private_subnet_ids" {
+  description = "IDs of the private subnets"
+  value       = module.network.private_subnets_id
 }
 
-output "internet_gateway_id" {
-  description = "The ID of the Internet Gateway"
-  value       = module.vpc.internet_gateway_id
+output "natgw_id" {
+  value = module.nat.natgw_id
 }
+output "natgw_eip" {
+  value = module.nat.natgw_eip
+}
+
 
 output "route_table_id" {
   description = "The ID of the Route Table"
-  value       = module.vpc.route_table_id
+  value       = module.network.private_route_table_ids
 }
 
 output "ecs_service_sg_id" {
