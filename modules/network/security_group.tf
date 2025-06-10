@@ -1,16 +1,16 @@
-resource "aws_security_group" "lambda_sg" {
-  name        = "${var.name_prefix}-${terraform.workspace}-lambda-sg"
-  description = "Security group for Lambda functions"
+resource "aws_security_group" "demo_sg" {
+  name        = "${var.name_prefix}-sg"
+  description = "Security group for containers"
   vpc_id      = aws_vpc.demo-vpc.id
 
   tags = merge(var.tags, {
-    Name = "${var.name_prefix}-lambda-sg"
+    Name = "${var.name_prefix}-containers-sg"
   })
 }
 
 # Default outbound rule (allow all outbound traffic)
 resource "aws_security_group_rule" "lambda_egress" {
-  security_group_id = aws_security_group.lambda_sg.id
+  security_group_id = aws_security_group.demo_sg.id
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -19,10 +19,10 @@ resource "aws_security_group_rule" "lambda_egress" {
 }
 
 # Add custom ingress rules if needed
-resource "aws_security_group_rule" "lambda_ingress" {
+resource "aws_security_group_rule" "ecs_ingress" {
   for_each = { for rule in var.ingress_rules : rule.name => rule }
 
-  security_group_id = aws_security_group.lambda_sg.id
+  security_group_id = aws_security_group.demo_sg.id
   type              = "ingress"
   description       = each.value.description
   from_port         = each.value.from_port
