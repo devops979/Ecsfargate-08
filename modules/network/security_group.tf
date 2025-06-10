@@ -2,7 +2,9 @@ resource "aws_security_group" "demo_sg" {
   name        = "${var.name_prefix}-${terraform.workspace}-sg"
   description = "Security group for Task definition"
   vpc_id      = aws_vpc.demo-vpc.id
-
+     lifecycle {
+    create_before_destroy = true
+  }
   tags = merge(var.tags, {
     Name = "${var.name_prefix}-ecs_fargate-sg"
   })
