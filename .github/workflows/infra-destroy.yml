@@ -57,7 +57,7 @@ jobs:
       - name: Select or Create Terraform Workspace
         working-directory: ./
         run: |
-          env="${{ github.event.inputs.environment || 'prod' }}"
+          env="${{ github.event.inputs.environment || 'dev' }}"
           if ! terraform workspace list | grep -w "$env"; then
             terraform workspace new "$env"
           fi
@@ -68,6 +68,6 @@ jobs:
         working-directory: ./
         run: |
           terraform init
-          terraform destroy -auto-approve \
+          terraform destroy -auto-approve -var-file="environments/dev/dev.tfvars" \
             -var="aws_region=${{ env.AWS_REGION }}"
  
