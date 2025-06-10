@@ -1,6 +1,6 @@
 aws_region                = "ap-south-1"
 name_prefix="demo-ecs_fargate"
-vpc_cidr_block            = "192.168.0.0/16"
+cidr_block            = "192.168.0.0/16"
 environment               = "dev"
 public_subnet_cidrs       = ["192.168.1.0/24", "192.168.2.0/24"]
 private_subnet_cidrs      = ["192.168.101.0/24", "192.168.102.0/24"]
