@@ -14,3 +14,4 @@ service_name_patitent     = "dev/demo-ecs-patitent"
 service_name_appointment  = "dev/demo-ecs-appointment"
 ecs_execution_role_name   = "ecs-execution-role"
 ecs_task_role_name        = "ecs-task-role"
+availability_zones= ["ap-south-1a", "ap-south-1b"]
