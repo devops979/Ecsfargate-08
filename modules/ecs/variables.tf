@@ -52,3 +52,9 @@ variable "alb_arn" {
   description = "The ARN of the application load balancer"
   type        = string
 }
+
+
+variable "log_group_name" {
+  type        = string
+  description = "The name of the CloudWatch log group to use"
+}

@@ -36,11 +36,12 @@ resource "aws_ecs_task_definition" "patient_service" {
     logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
-          awslogs-region        = "us-east-1"
+          awslogs-group         = var.log_group_name
+          awslogs-region        = "ap-south-1"
           awslogs-stream-prefix = "patient-service"
         }
     }
+    
   }])
 }
 
@@ -69,8 +70,8 @@ resource "aws_ecs_task_definition" "appointment_service" {
     logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
-          awslogs-region        = "us-east-1"
+          awslogs-group         = var.log_group_name
+          awslogs-region        = "ap-south-1"
           awslogs-stream-prefix = "appointment-service"
         }
     }

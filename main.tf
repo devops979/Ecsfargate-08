@@ -103,6 +103,8 @@ module "ecs" {
   appointment_tg_arn        = module.alb.patient_tg_arn
   patient_tg_arn            = module.alb.appointment_tg_arn
   alb_arn                   = module.alb.alb_arn
+  log_group_name = module.cloudwatch.log_group_name
+  depends_on = [module.cloudwatch]
 }
 
 module "alb" {
