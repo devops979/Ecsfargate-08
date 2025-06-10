@@ -1,25 +1,14 @@
-resource "aws_security_group" "demo_sg" {
-  name        = "${var.name_prefix}-sg"
-  description = "Security group for containers"
-  vpc_id      = aws_vpc.demo-vpc.id
-
-  tags = merge(var.tags, {
-    Name = "${var.name_prefix}-containers-sg"
-  })
-}
-
-# Default outbound rule (allow all outbound traffic)
-resource "aws_security_group_rule" "ecs_egress" {
+# For demo_sg
+resource "aws_security_group_rule" "ecs_egress_demo" {
   security_group_id = aws_security_group.demo_sg.id
   type              = "egress"
   from_port         = 0
   to_port           = 0
-  protocol          = "-1" # All protocols
+  protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# Add custom ingress rules if needed
-resource "aws_security_group_rule" "ecs_ingress" {
+resource "aws_security_group_rule" "ecs_ingress_demo" {
   for_each = { for rule in var.ingress_rules : rule.name => rule }
 
   security_group_id = aws_security_group.demo_sg.id
@@ -31,36 +20,22 @@ resource "aws_security_group_rule" "ecs_ingress" {
   cidr_blocks       = each.value.cidr_blocks
 }
 
-
-resource "aws_security_group" "alb_sg" {
-  name        = "${var.name_prefix}-sg"
-  description = "Security group for containers"
-  vpc_id      = aws_vpc.demo-vpc.id
-
-  tags = merge(var.tags, {
-    Name = "${var.name_prefix}-containers-sg"
-  })
-}
-
-# Default outbound rule (allow all outbound traffic)
-resource "aws_security_group_rule" "ecs_egress" {
+# For alb_sg
+resource "aws_security_group_rule" "ecs_egress_alb" {
   security_group_id = aws_security_group.alb_sg.id
   type              = "egress"
   from_port         = 0
   to_port           = 0
-  protocol          = "-1" # All protocols
+  protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-# Add custom ingress rules if needed
-resource "aws_security_group_rule" "ecs_ingress" {
+resource "aws_security_group_rule" "ecs_ingress_alb" {
   security_group_id = aws_security_group.alb_sg.id
   type              = "ingress"
-  description       = "Alloing load balancer port"
+  description       = "Allowing load balancer port"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-
 }
-
