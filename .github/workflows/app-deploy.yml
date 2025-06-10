@@ -43,6 +43,12 @@ jobs:
         with:
           terraform_version: ">= 1.12.0"  # or latest stable
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # or any version you need
+
+
       - name: Terraform Init - Infra
         working-directory: ./
         run: terraform init
