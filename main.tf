@@ -1,11 +1,20 @@
-module "vpc" {
-  source = "./modules/vpc"
+module "network" {
+  source             = "./modules/network"
+  vpc_cidr           = var.cidr_block
+  vpc_name           = "demo-ec-fargate-vpc"
+  environment        = var.environment
+  public_cidr_block  = var.public_subnet_cidrs
+  private_cidr_block = var.private_subnet_cidrs
+  azs                = var.availability_zones
+  owner              = "demo-ecs-fargate"
+  name_prefix        = var.name_prefix
+}
 
-  vpc_cidr_block        = var.vpc_cidr_block
-  subnet_cidr_block_1   = var.subnet_cidr_block_1
-  subnet_cidr_block_2   = var.subnet_cidr_block_2
-  availability_zone_1   = var.availability_zone_1
-  availability_zone_2   = var.availability_zone_2
+module "nat" {
+  source            = "./modules/nat"
+  public_subnet_ids = module.network.public_subnets_id
+  private_rt_ids    = module.network.private_route_table_ids
+  vpc_name          = module.network.vpc_name
 }
 
 module "iam" {
@@ -13,6 +22,24 @@ module "iam" {
 
   ecs_execution_role_name = var.ecs_execution_role_name
   ecs_task_role_name      = var.ecs_task_role_name
+}
+
+
+module "ecr" {
+  source          = "./modules/ecr"
+  repository_name = "${var.service_name}-${terraform.workspace}"
+  lifecycle_policy = jsonencode({
+    rules = [{
+      rulePriority = 1,
+      description  = "Keep last 5 images",
+      action       = { type = "expire" },
+      selection = {
+        tagStatus   = "any",
+        countType   = "imageCountMoreThan",
+        countNumber = 5
+      }
+    }]
+  })
 }
 
 
@@ -42,6 +69,7 @@ module "alb" {
   lb_security_group      = [module.vpc.alb_sg_id]
   lb_subnets             = [module.vpc.public_subnet_1_id, module.vpc.public_subnet_2_id]
 }
+
 
 module "cloudwatch" {
   source         = "./modules/cloudwatch"
