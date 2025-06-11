@@ -53,36 +53,32 @@ jobs:
           sudo apt install -y gh
 
         
-      - name: Upload SARIF file
+      - name: Upload SARIF file via GitHub API
         if: success() || failure()
         env:
-          GH_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           if [ -f "results.sarif" ]; then
-            echo "SARIF file found. Preparing to upload..."
+            echo "Uploading SARIF file using GitHub REST API..."
       
-            # Ensure GitHub CLI is installed
-            if ! command -v gh &> /dev/null; then
-              echo "GitHub CLI not found. Installing..."
-              sudo apt update && sudo apt install -y gh
-            fi
-      
-            # Authenticate GitHub CLI using GH_TOKEN
-            echo "${GH_TOKEN}" | gh auth login --with-token
-      
-            # Install GitHub CLI CodeQL extension if not already installed
-            if ! gh extension list | grep -q 'github/gh-codeql'; then
-              echo "Installing GitHub CLI CodeQL extension..."
-              gh extension install github/gh-codeql
-            else
-              echo "GitHub CLI CodeQL extension already installed."
-            fi
-      
-            # Upload SARIF file
-            gh codeql upload-sarif --sarif=results.sarif
+            curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data @- \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/code-scanning/sarifs" <<EOF
+          {
+            "commit_sha": "${GITHUB_SHA}",
+            "ref": "refs/pull/${{ github.event.pull_request.number }}/merge",
+            "sarif": "$(base64 -w 0 results.sarif)",
+            "tool_name": "Checkov"
+          }
+          EOF
+          
           else
             echo "No SARIF file found. Skipping upload."
-          fi      
+          fi
+           
               
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
