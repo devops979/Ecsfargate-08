@@ -134,7 +134,7 @@ jobs:
           tar -xzf terraform-docs.tar.gz
           mv terraform-docs /usr/local/bin/
 
-      - name: Generate-directory: ./
+      - name: Generate-directory
         if: github.event.pull_request.head.repo.full_name == github.repository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
