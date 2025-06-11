@@ -32,8 +32,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
- #       with:
- #         fetch-depth: 0  # 👈 fetch full commit history
+        with:
+          fetch-depth: 0  # 👈 fetch full commit history
 
       - name: Detect Changes
         uses: dorny/paths-filter@v2
