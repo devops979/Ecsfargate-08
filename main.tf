@@ -20,8 +20,8 @@ module "network" {
   {
     name        = "custom-port"
     description = "Allow traffic to custom port"
-    from_port   = 30001
-    to_port     = 30001
+    from_port   = 3001
+    to_port     = 3001
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   },
