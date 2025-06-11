@@ -132,7 +132,7 @@ jobs:
         run: |
           curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
-          mv terraform-docs /usr/local/bin/
+          sudo mv terraform-docs /usr/local/bin/
 
       - name: Generate-directory
         if: github.event.pull_request.head.repo.full_name == github.repository
