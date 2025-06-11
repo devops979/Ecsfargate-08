@@ -159,7 +159,7 @@ jobs:
           if [[ "${{ needs.build-appointment-service.result }}" == "success" ]]; then
             aws ecs wait services-stable \
               --cluster demo-ecs-cluster \
-              --services appointment-servic
+              --services appointment-service
           fi
  
   deploy_infrastructure:
