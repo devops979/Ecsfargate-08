@@ -101,8 +101,8 @@ module "ecs" {
   appointment_service_image = var.appointment_service_image
   subnet_id                 = module.network.private_subnets_id
   security_group_id         = module.network.ecs_security_group_id
-  appointment_tg_arn        = module.alb.patient_tg_arn
-  patient_tg_arn            = module.alb.appointment_tg_arn
+  appointment_tg_arn        = module.alb.appointment_tg_arn
+  patient_tg_arn            = module.alb.patient_tg_arn
   alb_arn                   = module.alb.alb_arn
   log_group_name = module.cloudwatch.log_group_name
   depends_on = [module.cloudwatch]
