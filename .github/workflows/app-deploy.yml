@@ -24,7 +24,7 @@ permissions:
 jobs:
   create-ecr-repository:
     name: Create ECR Repository
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'dev' }}
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/main'))
 
