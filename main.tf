@@ -117,6 +117,8 @@ module "alb" {
   vpc_id                 = module.network.vpc_id
   lb_security_group      = [module.network.alb_security_group_id]
   lb_subnets             = module.network.public_subnets_id
+  project_name    = var.project_name
+  environment     = var.environment
 }
 
 
