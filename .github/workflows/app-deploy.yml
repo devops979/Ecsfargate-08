@@ -12,7 +12,8 @@ on:
           - dev
           - staging
           - prod
-
+  push:
+    branches: [main]
 
 env:
   AWS_REGION: ap-south-1
