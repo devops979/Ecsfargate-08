@@ -51,12 +51,24 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gh
-      
+
+        
       - name: Upload SARIF file
         if: success() || failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUBTOKEN }}
         run: |
           if [ -f "results.sarif" ]; then
             echo "SARIF file found. Preparing to upload..."
+      
+            # Ensure GitHub CLI is installed
+            if ! command -v gh &> /dev/null; then
+              echo "GitHub CLI not found. Installing..."
+              sudo apt update && sudo apt install -y gh
+            fi
+      
+            # Authenticate GitHub CLI using GH_TOKEN
+            echo "${GH_TOKEN}" | gh auth login --with-token
       
             # Install GitHub CLI CodeQL extension if not already installed
             if ! gh extension list | grep -q 'github/gh-codeql'; then
@@ -70,11 +82,7 @@ jobs:
             gh codeql upload-sarif --sarif=results.sarif
           else
             echo "No SARIF file found. Skipping upload."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
-
-      
+          fi      
               
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
