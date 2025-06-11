@@ -51,21 +51,29 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gh
-
+      
       - name: Upload SARIF file
         if: success() || failure()
         run: |
           if [ -f "results.sarif" ]; then
-            echo "Installing GitHub CLI CodeQL extension..."
-            gh extension install github/gh-codeql
+            echo "SARIF file found. Preparing to upload..."
       
-            echo "SARIF file found. Uploading..."
+            # Install GitHub CLI CodeQL extension if not already installed
+            if ! gh extension list | grep -q 'github/gh-codeql'; then
+              echo "Installing GitHub CLI CodeQL extension..."
+              gh extension install github/gh-codeql
+            else
+              echo "GitHub CLI CodeQL extension already installed."
+            fi
+      
+            # Upload SARIF file
             gh codeql upload-sarif --sarif=results.sarif
           else
             echo "No SARIF file found. Skipping upload."
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+
       
               
       - name: Configure AWS Credentials (OIDC)
