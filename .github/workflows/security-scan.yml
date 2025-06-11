@@ -105,81 +105,70 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        timeout-minutes: 10
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
         continue-on-error: true
-        shell: bash
-        env:
-          TF_IN_AUTOMATION: "true"
-          TF_LOG: "DEBUG"
-        run: |
-          terraform plan -no-color > plan.txt 2> debug.log
-          cat plan.txt
-          echo "stdout<<EOF" >> $GITHUB_OUTPUT
-          cat plan.txt >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Inject Terraform Plan into README.md
-        run: |
-          echo -e "\n## Terraform Plan Output\n" >> $GITHUB_WORKSPACE/README.md
-          cat plan.txt >> $GITHUB_WORKSPACE/README.md
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.9.1
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
 
       - name: Install terraform-docs
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           curl -sSLo ./terraform-docs.tar.gz https://terraform-docs.io/dl/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/
 
-      - name: Generate-directory
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
+      - name: Generate Terraform Docs and Commit
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config --local user.email "devops979@gmail.com"
           git config --local user.name "devops979"
-          git fetch origin ${{ github.head_ref }}
-          git checkout ${{ github.head_ref }}
-          git remote set-url origin https://${{ github.actor }}:${GITHUBTOKEN}@github.com/${{ github.repository }}
+
           terraform-docs markdown . > README.md.new
           mv README.md.new README.md
+
           if [ -f README.md ]; then
             git add README.md
-            git diff --cached --quiet && echo "No changes to commit" || git commit -m "docs(terraform): Update README.md via terraform-docs"
-            git push origin HEAD:${{ github.head_ref }}
+            if git commit -m "docs: Update README.md"; then
+              git push
+              echo "Successfully committed and pushed README.md changes."
+            else
+              echo "No README.md changes to commit."
+            fi
           else
             echo "README.md was not generated."
-          fi 
-      - name: Update Pull Request with Terraform Plan
+          fi
+      - name: Update Pull Request
         uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
         env:
-          PLAN: "${{ steps.plan.outputs.stdout }}"
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.GITHUBTOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const plan = process.env.PLAN || "No plan output available.";
-            const output = [
-              "#### Terraform Format and Style ",
-              "#### Terraform Initialization ",
-              "#### Terraform Validation ",
-              "#### Terraform Plan 📄",
-              "",
-              "<details><summary>Show Plan</summary>",
-              "",
-              "```hcl",
-              plan,
-              "```",
-              "",
-              "</details>",
-              "",
-              `*Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`
-            ].join('\n');
+            const output = `#### Terraform Format and Style \`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization \`${{ steps.init.outcome }}\`
+            #### Terraform Validation \`${{ steps.validate.outcome }}\`
+            #### Terraform Plan \`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: output
-            });
+            })
