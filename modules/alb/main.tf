@@ -65,9 +65,9 @@ resource "aws_lb_listener" "http_listener" {
   default_action {
     type             = "fixed-response"
     fixed_response {
-      status_code   = 200
-      message_body  = "Message from the ALB"
-      content_type  = "text/plain"
+      content_type = "text/plain"
+      message_body = "Healthcare Application - Try /patients or /appointments"
+      status_code  = "404"
     }
   }
   tags = {
