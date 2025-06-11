@@ -35,6 +35,11 @@ variable "service_name_appointment" {
   default     = "dev/demo-ecs-appointment"
 }
 
+variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "healthcare-app"
+} 
 
 variable "public_subnet_cidrs" {
   description = "List of CIDR blocks for public subnets"
