@@ -24,7 +24,7 @@ env:
 jobs:
   detect-changes:
     name: Detect Changes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       patient-service: ${{ steps.changes.outputs.patient-service }}
       appointment-service: ${{ steps.changes.outputs.appointment-service }}
@@ -54,7 +54,7 @@ jobs:
 
   build-patient-service:
     name: Build Patient Service
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: detect-changes
     if: needs.detect-changes.outputs.patient-service == 'true'
 
@@ -86,7 +86,7 @@ jobs:
 
   build-appointment-service:
     name: Build Appointment Service
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: detect-changes
     if: needs.detect-changes.outputs.appointment-service == 'true'
 
@@ -118,7 +118,7 @@ jobs:
 
   deploy:
     name: Deploy to ECS
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [build-patient-service, build-appointment-service]
     if: always() && (needs.build-patient-service.result == 'success' || needs.build-appointment-service.result == 'success') && github.ref == 'refs/heads/main'
     
@@ -163,7 +163,7 @@ jobs:
           fi
  
   deploy_infrastructure:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [deploy]
     if: always()
     environment: ${{ github.event.inputs.environment || 'dev' }}
