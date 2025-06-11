@@ -120,7 +120,7 @@ resource "aws_lb_listener_rule" "appointment_service_rule" {
 
 # Health check rule for both services
 resource "aws_lb_listener_rule" "health_check" {
-  listener_arn = aws_lb_listener.main.arn
+  listener_arn = aws_lb_listener.http_listener.arn
   priority     = 50
 
   action {
